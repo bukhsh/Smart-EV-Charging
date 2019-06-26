@@ -1,0 +1,8 @@
+Wed, 26 Jun 2019 15:48:56 INFO     EV Scheduling log file
+Wed, 26 Jun 2019 15:48:56 INFO     Program started
+Wed, 26 Jun 2019 15:48:56 INFO     Solver selected: cplex
+Wed, 26 Jun 2019 15:48:56 INFO     Testcase selected: case24_ieee_rts.xlsx
+Wed, 26 Jun 2019 15:48:56 INFO     Model selected: EVSchedule
+Wed, 26 Jun 2019 15:48:56 INFO     Given model file found and selected from the models library
+Wed, 26 Jun 2019 15:48:57 INFO     Given testcase file found and selected from the testcase library
+Wed, 26 Jun 2019 15:49:06 INFO     Done!
