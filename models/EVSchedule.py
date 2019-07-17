@@ -32,11 +32,13 @@ model.TRed   = Set()  # set of time periods
 model.EV     = Set()  # set of EVs
 model.Window = Set()
 
+model.EVWindow = Set(within=model.EV*model.Window)
+
 model.EVFlexWindow     = Set(within = model.EV*model.Window*model.LE)
-model.FlexTimes        = Set(within = model.EV*model.T)
-model.FlexTimesRed     = Set(within = model.EV*model.T)
-model.EVBoundaryStart  = Set(within = model.EV*model.T) #boundary conditions
-model.EVBoundaryEnd    = Set(within = model.EV*model.T) #boundary conditions
+model.FlexTimes        = Set(within = model.EV*model.Window*model.T)
+model.FlexTimesRed     = Set(within = model.EV*model.Window*model.T)
+model.EVBoundaryStart  = Set(within = model.FlexTimes) #boundary conditions
+model.EVBoundaryEnd    = Set(within = model.FlexTimes) #boundary conditions
 
 
 model.SoCStart     = Param(model.EVBoundaryStart)
@@ -135,7 +137,7 @@ model.precontingency_cost_const = Constraint(model.T,rule=precontingency_cost)
 # --- Kirchoff's current law Definition at each bus b ---
 def KCL_def(model, b,t):
     return sum(model.pG[g,t] for g in model.G if (b,g) in model.Gbs) -\
-    sum(model.pEV[c,t] for c in model.EV if (b,c) in model.EVbs if (c,t) in model.FlexTimes) == \
+    sum(model.pEV[c,w,t] for (c,w) in model.EVWindow if (b,c) in model.EVbs if (c,w,t) in model.FlexTimes) == \
     sum(model.pD[d,t] for d in model.D if (b,d) in model.Dbs)+\
     sum(model.pL[l,t] for l in model.L if model.A[l,1]==b)- \
     sum(model.pL[l,t] for l in model.L if model.A[l,2]==b)+\
@@ -165,23 +167,18 @@ model.demandalphaC = Constraint(model.D, model.T, rule=demand_LS_bound_Max)
 
 
 # --- EV charging model ---
-# def EV_model(model,c,t):
-#     return model.SoC[c,t] == model.pEVIn[c,t] + model.SoC[c,t-1]
-# model.EVmodelConst = Constraint(model.EV,model.TRed)
-
-def EV_SoC(model,c,t):
-        return model.SoC[c,t] == model.pEV[c,t] + model.SoC[c,t-1]
+def EV_SoC(model,c,w,t):
+        return model.SoC[c,w,t] == model.pEV[c,w,t] + model.SoC[c,w,t-1]
 model.EVmodel = Constraint(model.FlexTimesRed,rule=EV_SoC)
 
 
-def EV_SoCBoundary1(model,c,t):
-        return model.SoC[c,t] == model.SoCStart[c,t]
+def EV_SoCBoundary1(model,c,w,t):
+        return model.SoC[c,w,t] == model.SoCStart[c,w,t]
 model.EVmodelSoCStart = Constraint(model.EVBoundaryStart,rule=EV_SoCBoundary1)
 
-def EV_SoCBoundary2(model,c,t):
-        return model.SoC[c,t] == model.SoCEnd[c,t]
+def EV_SoCBoundary2(model,c,w,t):
+        return model.SoC[c,w,t] == model.SoCEnd[c,w,t]
 model.EVmodelSoCEnd = Constraint(model.EVBoundaryEnd,rule=EV_SoCBoundary2)
-
 
 # --- generator power limits ---
 def Real_Power_Max(model,g,t):
@@ -198,8 +195,8 @@ def line_lim1_def(model,l,t):
 def line_lim2_def(model,l,t):
     return model.pL[l,t] >= -model.SLmax[l]
 #the next two lines creates line flow constraints for each line.
-model.line_lim1 = Constraint(model.L, model.T, rule=line_lim1_def)
-model.line_lim2 = Constraint(model.L, model.T, rule=line_lim2_def)
+# model.line_lim1 = Constraint(model.L, model.T, rule=line_lim1_def)
+# model.line_lim2 = Constraint(model.L, model.T, rule=line_lim2_def)
 
 # --- power flow limits on transformer lines---
 def transf_lim1_def(model,l,t):

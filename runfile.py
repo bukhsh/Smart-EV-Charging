@@ -30,7 +30,8 @@ def main():
 
     # =====Test cases=====
     #give a path to the testcase file under the 'testcase' folder
-    testcase = 'case24_ieee_rts.xlsx'
+    testcase = 'SP53224_10020195_87729.xlsx'
+    # testcase = 'case24_ieee_rts.xlsx'
     #testcase = 'case2.xlsx'
     # =====Model=====
     #specify a model to solve
