@@ -1,0 +1,7 @@
+Job 7298335 dispatched
+password: mULFVDnQ
+---------- Begin Solver Output -----------
+Condor submit: 'neos.submit'
+Condor submit: 'watchdog.submit'
+Job submitted to NEOS HTCondor pool.
+

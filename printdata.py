@@ -58,6 +58,12 @@ class printdata(object):
                 f.write(str(i)+"\n")
             f.write(';\n')
 
+            f.write('set EVWindow:=\n')
+            for i in self.data["EV"]["name"].unique():
+                for window in range(1,7):
+                    f.write(str(i)+" "+str(window)+"\n")
+            f.write(';\n')
+
         #---EVs-bus mapping---
         if len(self.data["EV"]["name"])!=0:
             f.write('set EVbs:=\n')
@@ -65,58 +71,63 @@ class printdata(object):
                 f.write(str(self.data["EV"]["busname"][i]) + " "+str(self.data["EV"]["name"][i])+"\n")
             f.write(';\n')
             #---EV flexibility windows---
-            f.write('set FlexTimes:= \n')
-            for i in self.data["EV"].index.tolist():
-                lst = self.data["EV"]['name'][self.data["EV"]['name'][i]==self.data["EVsTravelDiary"]["name"]].index.tolist()
-                for ev in lst:
-                    for t in range(int(self.data["EVsTravelDiary"]["t_in"][ev]),int(self.data["EVsTravelDiary"]["t_out"][ev]+1)):
-                        f.write(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(t)+"\n")
-            f.write(';\n')
-            f.write('set FlexTimesRed:= \n')
-            for i in self.data["EV"].index.tolist():
-                lst = self.data["EV"]['name'][self.data["EV"]['name'][i]==self.data["EVsTravelDiary"]["name"]].index.tolist()
-                for ev in lst:
-                    for t in range(int(self.data["EVsTravelDiary"]["t_in"][ev])+1,int(self.data["EVsTravelDiary"]["t_out"][ev]+1)):
-                        f.write(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(t)+"\n")
-            f.write(';\n')
-            # flexibility times
+            df_flex = pd.DataFrame(columns={'EV','Window','Start','End','SoCStart','SoCEnd'})
+            ind = 0
             f.write('set EVFlexWindow:= \n')
             for i in self.data["EV"].index.tolist():
                 window = 1
-                lst = self.data["EV"]['name'][self.data["EV"]['name'][i]==self.data["EVsTravelDiary"]["name"]].index.tolist()
+                lst = self.data["EVsTravelDiary"]["name"][self.data["EV"]['name'][i]==self.data["EVsTravelDiary"]["name"]].index.tolist()
                 for ev in lst:
-                    f.write(str(self.data["EVsTravelDiary"]['name'][ev]+" "+str(window)+" "+str(1)+"\n"))
-                    f.write(str(self.data["EVsTravelDiary"]['name'][ev]+" "+str(window)+" "+str(2)+"\n"))
-                    window+=1
+                    f.write(str(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(window)+" "+str(1)+"\n"))
+                    f.write(str(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(window)+" "+str(2)+"\n"))
+                    df_flex.loc[ind] = pd.Series({'EV':self.data["EVsTravelDiary"]['name'][ev],'Window':window,\
+                    'Start':self.data["EVsTravelDiary"]['t_in'][i],'End':self.data["EVsTravelDiary"]['t_out'][i],\
+                    'SoCStart':self.data["EVsTravelDiary"]['EStart'][i],'SoCEnd':self.data["EVsTravelDiary"]['EEnd'][i]})
+
+                    ind += 1
+                    window += 1
             f.write(';\n')
 
+            f.write('set FlexTimes:= \n')
+            for i in df_flex.index.tolist():
+                for t in range(int(df_flex["Start"][i]),int(df_flex["End"][i])+1):
+                    f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(t)+"\n")
+            f.write(';\n')
+
+            f.write('set FlexTimesRed:= \n')
+            for i in df_flex.index.tolist():
+                for t in range(int(df_flex["Start"][i])+1,int(df_flex["End"][i])+1):
+                    f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(t)+"\n")
+            f.write(';\n')
+            # flexibility times
+
+
             f.write('set EVBoundaryStart:= \n')
-            for ev in self.data["EVsTravelDiary"]['name'].index.tolist():
-                f.write(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(self.data["EVsTravelDiary"]['t_in'][ev])+"\n")
+            for i in df_flex.index.tolist():
+                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["Start"][i])+"\n")
             f.write(';\n')
             f.write('set EVBoundaryEnd:= \n')
-            for ev in self.data["EVsTravelDiary"]['name'].index.tolist():
-                f.write(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(self.data["EVsTravelDiary"]['t_out'][ev])+"\n")
+            for i in df_flex.index.tolist():
+                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["End"][i])+"\n")
             f.write(';\n')
 
 
             f.write('param SoCStart:= \n')
-            for ev in self.data["EVsTravelDiary"]['name'].index.tolist():
-                f.write(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(self.data["EVsTravelDiary"]['t_in'][ev])+" "+str(float(self.data["EVsTravelDiary"]['SoCStart'][ev])/self.data["baseMVA"]["baseMVA"][0])+"\n")
+            for i in df_flex.index.tolist():
+                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["Start"][i])+" "+str(df_flex["SoCStart"][i])+"\n")
             f.write(';\n')
             f.write('param SoCEnd:= \n')
-            for ev in self.data["EVsTravelDiary"]['name'].index.tolist():
-                f.write(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(self.data["EVsTravelDiary"]['t_out'][ev])+" "+str(float(self.data["EVsTravelDiary"]['SoCEnd'][ev])/self.data["baseMVA"]["baseMVA"][0])+"\n")
+            for i in df_flex.index.tolist():
+                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["End"][i])+" "+str(df_flex["SoCEnd"][i])+"\n")
             f.write(';\n')
-
 
         #---set of time-periods---
         f.write('set T:= \n')
-        for i in self.data["timeseries"]["Demand"].index.tolist():
+        for i in self.data["timeseries"]['timeperiod']:
             f.write(str(i) + "\n")
         f.write(';\n')
         f.write('set TRed:= \n')
-        for i in self.data["timeseries"]["Demand"].index.tolist()[1:-1]:
+        for i in self.data["timeseries"]['timeperiod'][1:-1]:
             f.write(str(i) + "\n")
         f.write(';\n')
         f.close()
@@ -194,13 +205,13 @@ class printdata(object):
         #---Tranmission line bounds---
         f.write('param SLmax:=\n')
         for i in self.data["branch"].index.tolist():
-            f.write(str(self.data["branch"]["name"][i])+" "+str(float(self.data["branch"]["ContinousRating"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
+            f.write(str(self.data["branch"]["name"][i])+" "+str(float(self.data["branch"]["ContinuousRating"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
         f.write(';\n')
         #---Transformer chracteristics---
         if len(self.data["transformer"]["name"])!=0:
             f.write('param SLmaxT:=\n')
             for i in self.data["transformer"].index.tolist():
-                f.write(str(self.data["transformer"]["name"][i])+" "+str(float(self.data["transformer"]["ContinousRating"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
+                f.write(str(self.data["transformer"]["name"][i])+" "+str(float(self.data["transformer"]["ContinuousRating"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
             f.write(';\n')
         #---cost data---
         f.write('param c2:=\n')
@@ -220,9 +231,10 @@ class printdata(object):
         #===parameters===
         #---Real power demand---
         f.write('param PD:=\n')
-        for i in self.data["timeseries"]["Demand"]:
-            for j in self.data["timeseries"]["Demand"].index.tolist():
-                f.write(str(i)+" "+str(j)+" "+str(float(self.data["timeseries"]["Demand"][i][j])/self.data["baseMVA"]["baseMVA"][0])+"\n")
+        for i in self.data["timeseries"]:
+            if 'time' not in i:
+                for j in self.data["timeseries"][i].index.tolist():
+                    f.write(str(i)+" "+str(self.data["timeseries"]["timeperiod"][j])+" "+str(float(self.data["timeseries"][i][j])/self.data["baseMVA"]["baseMVA"][0])+"\n")
         f.write(';\n')
         f.write('param VOLL:=\n')
         for i in self.data["demand"].index.tolist():
@@ -269,11 +281,11 @@ class printdata(object):
         if len(self.data["EV"]["name"])!=0:
             f.write('param ChargeEff:=\n')
             for i in  self.data["EV"].index.tolist():
-                f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["ChargingEfficieny(%)"][i])/100.0)+"\n")
+                f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["ChargingEfficiency(%)"][i])/100.0)+"\n")
             f.write(';\n')
             f.write('param EVUB:=\n')
             for i in  self.data["EV"].index.tolist():
-                f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["capacity(MW)"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
+                f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["capacity(kW)"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
             f.write(';\n')
             f.write('param EVLB:=\n')
             for i in  self.data["EV"].index.tolist():

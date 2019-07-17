@@ -23,7 +23,7 @@ def selecttestcase(test):
     df_EV              = xl.parse("EVs")
     df_EVsTravelDiary  = xl.parse("EVsTravelDiary")
     df_baseMVA         = xl.parse("baseMVA")
-    df_ts              = xl.parse("timeseries",header=[0,1])
+    df_ts              = xl.parse("timeseries")#,header=[0,1])
 
     data = {
     "bus": df_bus,
