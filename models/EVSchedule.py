@@ -87,9 +87,7 @@ model.GB = Param(model.SHUNT, within=Reals) #  shunt conductance
 model.BB = Param(model.SHUNT, within=Reals) #  shunt susceptance
 
 # cost data
-model.c2    = Param(model.G, within=NonNegativeReals)# generator cost coefficient c2 (*pG^2)
-model.c1    = Param(model.G, within=NonNegativeReals)# generator cost coefficient c1 (*pG)
-model.c0    = Param(model.G, within=NonNegativeReals)# generator cost coefficient c0
+model.cost    = Param(model.G,model.T, within=NonNegativeReals)# generator cost coefficient c2 (*pG^2)
 
 model.baseMVA = Param(within=NonNegativeReals)# base MVA
 
@@ -126,7 +124,7 @@ model.OBJ = Objective(rule=objective, sense=minimize)
 
 # --- cost components of the objective function ---
 def precontingency_cost(model,t):
-    return model.CostTP[t] == sum(model.c2[g]*(model.baseMVA*model.pG[g,t])**2+model.c1[g]*model.baseMVA*model.pG[g,t]+model.c0[g] for g in model.G)\
+    return model.CostTP[t] == sum(model.cost[g,t]*model.baseMVA*model.pG[g,t] for g in model.G)\
     +sum(model.baseMVA*model.VOLL[d]*(1-model.alpha[d,t])*model.PD[d,t] for d in model.D)
 model.precontingency_cost_const = Constraint(model.T,rule=precontingency_cost)
 
