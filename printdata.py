@@ -193,15 +193,6 @@ class printdata(object):
             for i in self.data["transformer"].index.tolist():
                 f.write(str(self.data["transformer"]["name"][i])+" "+str(-float(1/self.data["transformer"]["x"][i]))+"\n")
             f.write(';\n')
-        #---Real power generation bounds---
-        f.write('param PGmin:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(float(self.data["generator"]["PGLB"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
-        f.write(';\n')
-        f.write('param PGmax:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(float(self.data["generator"]["PGUB"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
-        f.write(';\n')
         #---Tranmission line bounds---
         f.write('param SLmax:=\n')
         for i in self.data["branch"].index.tolist():
@@ -213,19 +204,6 @@ class printdata(object):
             for i in self.data["transformer"].index.tolist():
                 f.write(str(self.data["transformer"]["name"][i])+" "+str(float(self.data["transformer"]["ContinuousRating"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
             f.write(';\n')
-        #---cost data---
-        f.write('param c2:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(float(self.data["generator"]["costc2"][i]))+"\n")
-        f.write(';\n')
-        f.write('param c1:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(float(self.data["generator"]["costc1"][i]))+"\n")
-        f.write(';\n')
-        f.write('param c0:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(float(self.data["generator"]["costc0"][i]))+"\n")
-        f.write(';\n')
 
 
         #===parameters===
@@ -264,17 +242,9 @@ class printdata(object):
         f.write(';\n')
 
         #---cost data---
-        f.write('param c2:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(self.data["generator"]["costc2"][i])+"\n")
-        f.write(';\n')
-        f.write('param c1:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(self.data["generator"]["costc1"][i])+"\n")
-        f.write(';\n')
-        f.write('param c0:=\n')
-        for i in self.data["generator"].index.tolist():
-            f.write(str(self.data["generator"]["name"][i])+" "+str(self.data["generator"]["costc0"][i])+"\n")
+        f.write('param cost:=\n')
+        for i in self.data["cost"].index.tolist():
+            f.write(str(self.data["cost"]["name"][i])+" "+str(self.data["cost"]["timeperiod"][i])+" "+str(self.data["cost"]["cost(pounds/kwh)"][i])+"\n")
         f.write(';\n')
 
 

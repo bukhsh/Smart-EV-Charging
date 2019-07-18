@@ -24,6 +24,7 @@ def selecttestcase(test):
     df_EVsTravelDiary  = xl.parse("EVsTravelDiary")
     df_baseMVA         = xl.parse("baseMVA")
     df_ts              = xl.parse("timeseries")#,header=[0,1])
+    df_tsgen           = xl.parse("timeseriesGen")#,header=[0,1])
 
     data = {
     "bus": df_bus,
@@ -35,6 +36,7 @@ def selecttestcase(test):
     "EV":df_EV,
     "EVsTravelDiary":df_EVsTravelDiary,
     "baseMVA": df_baseMVA,
-    "timeseries": df_ts
+    "timeseries": df_ts,
+    "cost": df_tsgen
     }
     return data

@@ -1,6 +1,6 @@
 #This is Python generated data file for Pyomo model DCLF.py
 #_author_:W. Bukhsh
-#Time stamp: 2019-07-18 15:31:01.162475
+#Time stamp: 2019-07-18 16:00:17.135367
 set B:=
 0
 1
@@ -1554,12 +1554,6 @@ SP53224_10020195_87729_20 -9.90099009901
 param BLT:=
 trafo_74_75 -1000.0
 ;
-param PGmin:=
-GridConnection_58 0.0
-;
-param PGmax:=
-GridConnection_58 1000000.0
-;
 param SLmax:=
 SP53224_10020195_87729_21 0.175
 SP53224_10020195_87729_22 0.14
@@ -1638,15 +1632,6 @@ SP53224_10020195_87729_20 0.14
 ;
 param SLmaxT:=
 trafo_74_75 300.0
-;
-param c2:=
-GridConnection_58 0.0
-;
-param c1:=
-GridConnection_58 10.0
-;
-param c0:=
-GridConnection_58 0.0
 ;
 param PD:=
 D0 0 0.40629021237
@@ -5002,14 +4987,151 @@ GridConnection_58 0.0
 param RampDown:=
 GridConnection_58 0.0
 ;
-param c2:=
-GridConnection_58 0
-;
-param c1:=
-GridConnection_58 10
-;
-param c0:=
-GridConnection_58 0
+param cost:=
+GridConnection_58 0 10
+GridConnection_58 1 10
+GridConnection_58 2 10
+GridConnection_58 3 10
+GridConnection_58 4 10
+GridConnection_58 5 10
+GridConnection_58 6 10
+GridConnection_58 7 10
+GridConnection_58 8 10
+GridConnection_58 9 10
+GridConnection_58 10 10
+GridConnection_58 11 10
+GridConnection_58 12 10
+GridConnection_58 13 10
+GridConnection_58 14 10
+GridConnection_58 15 10
+GridConnection_58 16 10
+GridConnection_58 17 10
+GridConnection_58 18 10
+GridConnection_58 19 10
+GridConnection_58 20 10
+GridConnection_58 21 10
+GridConnection_58 22 10
+GridConnection_58 23 10
+GridConnection_58 24 10
+GridConnection_58 25 10
+GridConnection_58 26 10
+GridConnection_58 27 10
+GridConnection_58 28 10
+GridConnection_58 29 10
+GridConnection_58 30 10
+GridConnection_58 31 10
+GridConnection_58 32 10
+GridConnection_58 33 10
+GridConnection_58 34 10
+GridConnection_58 35 10
+GridConnection_58 36 10
+GridConnection_58 37 10
+GridConnection_58 38 10
+GridConnection_58 39 10
+GridConnection_58 40 10
+GridConnection_58 41 10
+GridConnection_58 42 10
+GridConnection_58 43 10
+GridConnection_58 44 10
+GridConnection_58 45 10
+GridConnection_58 46 10
+GridConnection_58 47 10
+GridConnection_58 48 10
+GridConnection_58 49 10
+GridConnection_58 50 10
+GridConnection_58 51 10
+GridConnection_58 52 10
+GridConnection_58 53 10
+GridConnection_58 54 10
+GridConnection_58 55 10
+GridConnection_58 56 10
+GridConnection_58 57 10
+GridConnection_58 58 10
+GridConnection_58 59 10
+GridConnection_58 60 10
+GridConnection_58 61 10
+GridConnection_58 62 10
+GridConnection_58 63 10
+GridConnection_58 64 10
+GridConnection_58 65 10
+GridConnection_58 66 10
+GridConnection_58 67 10
+GridConnection_58 68 10
+GridConnection_58 69 10
+GridConnection_58 70 10
+GridConnection_58 71 10
+GridConnection_58 72 10
+GridConnection_58 73 10
+GridConnection_58 74 10
+GridConnection_58 75 10
+GridConnection_58 76 10
+GridConnection_58 77 10
+GridConnection_58 78 10
+GridConnection_58 79 10
+GridConnection_58 80 10
+GridConnection_58 81 10
+GridConnection_58 82 10
+GridConnection_58 83 10
+GridConnection_58 84 10
+GridConnection_58 85 10
+GridConnection_58 86 10
+GridConnection_58 87 10
+GridConnection_58 88 10
+GridConnection_58 89 10
+GridConnection_58 90 10
+GridConnection_58 91 10
+GridConnection_58 92 10
+GridConnection_58 93 10
+GridConnection_58 94 10
+GridConnection_58 95 10
+GridConnection_58 96 10
+GridConnection_58 97 10
+GridConnection_58 98 10
+GridConnection_58 99 10
+GridConnection_58 100 10
+GridConnection_58 101 10
+GridConnection_58 102 10
+GridConnection_58 103 10
+GridConnection_58 104 10
+GridConnection_58 105 10
+GridConnection_58 106 10
+GridConnection_58 107 10
+GridConnection_58 108 10
+GridConnection_58 109 10
+GridConnection_58 110 10
+GridConnection_58 111 10
+GridConnection_58 112 10
+GridConnection_58 113 10
+GridConnection_58 114 10
+GridConnection_58 115 10
+GridConnection_58 116 10
+GridConnection_58 117 10
+GridConnection_58 118 10
+GridConnection_58 119 10
+GridConnection_58 120 10
+GridConnection_58 121 10
+GridConnection_58 122 10
+GridConnection_58 123 10
+GridConnection_58 124 10
+GridConnection_58 125 10
+GridConnection_58 126 10
+GridConnection_58 127 10
+GridConnection_58 128 10
+GridConnection_58 129 10
+GridConnection_58 130 10
+GridConnection_58 131 10
+GridConnection_58 132 10
+GridConnection_58 133 10
+GridConnection_58 134 10
+GridConnection_58 135 10
+GridConnection_58 136 10
+GridConnection_58 137 10
+GridConnection_58 138 10
+GridConnection_58 139 10
+GridConnection_58 140 10
+GridConnection_58 141 10
+GridConnection_58 142 10
+GridConnection_58 143 10
 ;
 param ChargeEff:=
 2009002484 0.88
