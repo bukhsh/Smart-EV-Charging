@@ -1,8 +1,7 @@
-Thu, 18 Jul 2019 16:00:17 INFO     EV Scheduling log file
-Thu, 18 Jul 2019 16:00:17 INFO     Program started
-Thu, 18 Jul 2019 16:00:17 INFO     Solver selected: cplex
-Thu, 18 Jul 2019 16:00:17 INFO     Testcase selected: SP53224_10020195_87729.xlsx
-Thu, 18 Jul 2019 16:00:17 INFO     Model selected: EVSchedule
-Thu, 18 Jul 2019 16:00:17 INFO     Given model file found and selected from the models library
-Thu, 18 Jul 2019 16:00:17 INFO     Given testcase file found and selected from the testcase library
-Thu, 18 Jul 2019 16:01:27 INFO     Done!
+Mon, 22 Jul 2019 15:10:38 INFO     EV Scheduling log file
+Mon, 22 Jul 2019 15:10:38 INFO     Program started
+Mon, 22 Jul 2019 15:10:38 INFO     Solver selected: cplex
+Mon, 22 Jul 2019 15:10:38 INFO     Testcase selected: SP53224_10020195_87729.xlsx
+Mon, 22 Jul 2019 15:10:38 INFO     Model selected: EVSchedule
+Mon, 22 Jul 2019 15:10:38 INFO     Given model file found and selected from the models library
+Mon, 22 Jul 2019 15:10:39 INFO     Given testcase file found and selected from the testcase library

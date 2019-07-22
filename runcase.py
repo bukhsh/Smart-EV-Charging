@@ -26,8 +26,8 @@ import logging
 #====================================
 
 def runcase(testcase,mod,opt=None):
-    print 'Selected model is: ', mod
-    print 'Selected testcase is: ', testcase
+    print ('Selected model is: ', mod)
+    print ('Selected testcase is: ', testcase)
     try:
         model = selectmodel(mod) #load model
         logging.info("Given model file found and selected from the models library")

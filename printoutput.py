@@ -19,34 +19,34 @@ class printoutput(object):
         self.instance  = instance
         self.mod       = mod
     def greet(self):
-        print "========================"
-        print "\n Output from the OATS"
-        print "========================"
+        print ("========================")
+        print ("\n Output from the OATS")
+        print ("========================")
     def solutionstatus(self):
         self.instance.solutions.load_from(self.results)
-        print "------Solver Message------"
-        print self.results.solver
-        print "--------------------------"
+        print ("------Solver Message------")
+        print (self.results.solver)
+        print ("--------------------------")
         if (self.results.solver.status == SolverStatus.ok) \
         and (self.results.solver.termination_condition == TerminationCondition.optimal):
-            print "Optimization Converged!"
+            print ("Optimization Converged!")
         elif self.results.solver.termination_condition == TerminationCondition.infeasible:
             sys.exit("Problem is infeasible!\nOats terminated. No output is written on the results file.")
         else:
-            print sys.exit("Problem is infeasible!\nOats terminated. No output is written on the results file.")
+            print (sys.exit("Problem is infeasible!\nOats terminated. No output is written on the results file."))
     def printsummary(self):
         if 'LF' not in self.mod:
-            print "Cost of the objective function:", str(float(self.instance.OBJ()))
-        print "***********"
-        print "\n Summary"
-        print "***********"
+            print ("Cost of the objective function:", str(float(self.instance.OBJ())))
+        print ("***********")
+        print ("\n Summary")
+        print ("***********")
         tab_summary = []
         tab_summary.append(['Time period','Conventional generation (kW)', 'Demand (kW)','Objective function value'])
         for t in self.instance.T:
             tab_summary.append([t,sum(self.instance.pG[g,t].value for g in self.instance.G)*self.instance.baseMVA,\
             sum(self.instance.PD[d,t] for d in self.instance.D)*self.instance.baseMVA, self.instance.CostTP[t].value])
-        print tabulate(tab_summary, headers="firstrow", tablefmt="grid")
-        print "=============================================="
+        print (tabulate(tab_summary, headers="firstrow", tablefmt="grid"))
+        print ("==============================================")
 
         # ev_summary = []
         # ev_summary.append(['Time period','Window','EV', 'Charging','SoC'])
