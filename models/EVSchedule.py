@@ -1,6 +1,6 @@
 #==================================================================
 # EVSchedule.mod
-# PYOMO model file of "DC" Security constrained-optimal power flow problem (SCOPF)
+# PYOMO model file
 # This formulation uses the standard "DC" model of AC power flow equations
 # ---Author---
 # W. Bukhsh,
@@ -66,8 +66,9 @@ model.RampUp   = Param(model.G, within=NonNegativeReals) # ramp up of generator 
 model.RampDown = Param(model.G, within=NonNegativeReals) # ramp down of generator g, p.u.
 
 # storage
-model.EVUB          = Param(model.EV, within=NonNegativeReals)# max real power capacity of storage, p.u.
-model.EVLB          = Param(model.EV, within=NonNegativeReals)# max real power capacity of storage, p.u.
+model.PVUB          = Param(model.EV, within=NonNegativeReals)# max real power charging capacity
+model.EVUB          = Param(model.EV, within=NonNegativeReals)# max energy capacity of the battery
+
 model.ChargeEff     = Param(model.EV, within=NonNegativeReals)# charging efficieny of storage
 model.RateCharge    = Param(model.EV, within=NonNegativeReals)# rate of charging of storage
 
@@ -164,7 +165,7 @@ model.demandalphaC = Constraint(model.D, model.T, rule=demand_LS_bound_Max)
 
 # --- EV charging model ---
 def EV_SoC(model,c,w,t):
-    return model.SoC[c,w,t] == model.pEV[c,w,t] + model.SoC[c,w,t-1]
+    return model.SoC[c,w,t] == 1/6*model.pEV[c,w,t-1] + model.SoC[c,w,t-1]
 model.EVmodel = Constraint(model.FlexTimesRed,rule=EV_SoC)
 
 
@@ -176,10 +177,14 @@ def EV_SoCBoundary2(model,c,w,t):
     return model.SoC[c,w,t] == model.SoCEnd[c,w,t]
 model.EVmodelSoCEnd = Constraint(model.EVBoundaryEnd,rule=EV_SoCBoundary2)
 
-def EV_ChargeCap(model,c,w,t):
-    return model.pEV[c,w,t] <= model.EVUB[c]
-model.EV_ChargeCapConst = Constraint(model.FlexTimes,rule=EV_ChargeCap)
+def EV_ChargeCap1(model,c,w,t):
+    return model.pEV[c,w,t] <= model.PVUB[c]
+def EV_ChargeCap2(model,c,w,t):
+    # return model.SoC[c,w,t]<=model.EVUB[c]
+    return model.pEV[c,w,t] <= (1.0/0.201)*model.PVUB[c]/model.EVUB[c]*(1.001*model.EVUB[c]-model.SoC[c,w,t])
 
+model.EV_ChargeCapConst1 = Constraint(model.FlexTimes,rule=EV_ChargeCap1)
+model.EV_ChargeCapConst2 = Constraint(model.FlexTimes,rule=EV_ChargeCap2)
 
 # --- generator power limits ---
 def Real_Power_Max(model,g,t):

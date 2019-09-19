@@ -253,13 +253,13 @@ class printdata(object):
             for i in  self.data["EV"].index.tolist():
                 f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["ChargingEfficiency(%)"][i])/100.0)+"\n")
             f.write(';\n')
-            f.write('param EVUB:=\n')
+            f.write('param PVUB:=\n')
             for i in  self.data["EV"].index.tolist():
                 f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["capacity(kW)"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
             f.write(';\n')
-            f.write('param EVLB:=\n')
+            f.write('param EVUB:=\n')
             for i in  self.data["EV"].index.tolist():
-                f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["Minoperatingcapacity(MW)"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
+                f.write(str(self.data["EV"]["name"][i])+" "+str(float(self.data["EV"]["battery(kWh)"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
             f.write(';\n')
 
         f.close()
