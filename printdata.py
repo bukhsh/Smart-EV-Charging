@@ -81,8 +81,8 @@ class printdata(object):
                     f.write(str(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(window)+" "+str(1)+"\n"))
                     f.write(str(str(self.data["EVsTravelDiary"]['name'][ev])+" "+str(window)+" "+str(2)+"\n"))
                     df_flex.loc[ind] = pd.Series({'EV':self.data["EVsTravelDiary"]['name'][ev],'Window':window,\
-                    'Start':self.data["EVsTravelDiary"]['t_in'][i],'End':self.data["EVsTravelDiary"]['t_out'][i],\
-                    'SoCStart':self.data["EVsTravelDiary"]['EStart'][i],'SoCEnd':self.data["EVsTravelDiary"]['EEnd'][i]})
+                    'Start':self.data["EVsTravelDiary"]['t_in'][ev],'End':self.data["EVsTravelDiary"]['t_out'][ev],\
+                    'SoCStart':self.data["EVsTravelDiary"]['EStart'][ev],'SoCEnd':self.data["EVsTravelDiary"]['EEnd'][ev]})
 
                     ind += 1
                     window += 1
@@ -91,34 +91,34 @@ class printdata(object):
             f.write('set FlexTimes:= \n')
             for i in df_flex.index.tolist():
                 for t in range(int(df_flex["Start"][i]),int(df_flex["End"][i])+1):
-                    f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(t)+"\n")
+                    f.write(str(int(df_flex["EV"][i]))+" "+str(int(df_flex["Window"][i]))+" "+str(t)+"\n")
             f.write(';\n')
 
             f.write('set FlexTimesRed:= \n')
             for i in df_flex.index.tolist():
                 for t in range(int(df_flex["Start"][i])+1,int(df_flex["End"][i])+1):
-                    f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(t)+"\n")
+                    f.write(str(int(df_flex["EV"][i]))+" "+str(int(df_flex["Window"][i]))+" "+str(t)+"\n")
             f.write(';\n')
             # flexibility times
 
 
             f.write('set EVBoundaryStart:= \n')
             for i in df_flex.index.tolist():
-                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["Start"][i])+"\n")
+                f.write(str(int(df_flex["EV"][i]))+" "+str(int(df_flex["Window"][i]))+" "+str(int(df_flex["Start"][i]))+"\n")
             f.write(';\n')
             f.write('set EVBoundaryEnd:= \n')
             for i in df_flex.index.tolist():
-                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["End"][i])+"\n")
+                f.write(str(int(df_flex["EV"][i]))+" "+str(int(df_flex["Window"][i]))+" "+str(int(df_flex["End"][i]))+"\n")
             f.write(';\n')
 
 
             f.write('param SoCStart:= \n')
             for i in df_flex.index.tolist():
-                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["Start"][i])+" "+str(df_flex["SoCStart"][i])+"\n")
+                f.write(str(int(df_flex["EV"][i]))+" "+str(int(df_flex["Window"][i]))+" "+str(int(df_flex["Start"][i]))+" "+str(round(df_flex["SoCStart"][i],2))+"\n")
             f.write(';\n')
             f.write('param SoCEnd:= \n')
             for i in df_flex.index.tolist():
-                f.write(str(df_flex["EV"][i])+" "+str(df_flex["Window"][i])+" "+str(df_flex["End"][i])+" "+str(df_flex["SoCEnd"][i])+"\n")
+                f.write(str(int(df_flex["EV"][i]))+" "+str(int(df_flex["Window"][i]))+" "+str(int(df_flex["End"][i]))+" "+str(round(df_flex["SoCEnd"][i],2))+"\n")
             f.write(';\n')
 
         #---set of time-periods---
@@ -241,12 +241,22 @@ class printdata(object):
             f.write(str(self.data["generator"]["name"][i])+" "+str(float(deltaT*self.data["generator"]["RampDown(MW/hr)"][i])/self.data["baseMVA"]["baseMVA"][0])+"\n")
         f.write(';\n')
 
-        #---cost data---
-        f.write('param cost:=\n')
+#        #---cost data---
+#        f.write('param cost:=\n')
+#        for i in self.data["cost"].index.tolist():
+#            f.write(str(self.data["cost"]["name"][i])+" "+str(self.data["cost"]["timeperiod"][i])+" "+str(self.data["cost"]["cost(pounds/kwh)"][i])+"\n")
+#        f.write(';\n')
+#        
+        #---V2G: System Buy Price (SBP -- charging) and System Sell Price (SSP -- discharging)        
+        f.write('param SBP:=\n')
         for i in self.data["cost"].index.tolist():
-            f.write(str(self.data["cost"]["name"][i])+" "+str(self.data["cost"]["timeperiod"][i])+" "+str(self.data["cost"]["cost(pounds/kwh)"][i])+"\n")
+            f.write(str(self.data["cost"]["name"][i])+" "+str(self.data["cost"]["timeperiod"][i])+" "+str(self.data["cost"]["SBP(pounds/kwh)"][i])+"\n")
         f.write(';\n')
-
+        
+        f.write('param SSP:=\n')
+        for i in self.data["cost"].index.tolist():
+            f.write(str(self.data["cost"]["name"][i])+" "+str(self.data["cost"]["timeperiod"][i])+" "+str(self.data["cost"]["SSP(pounds/kwh)"][i])+"\n")
+        f.write(';\n')
 
         if len(self.data["EV"]["name"])!=0:
             f.write('param ChargeEff:=\n')

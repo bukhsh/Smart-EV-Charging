@@ -30,12 +30,14 @@ def main():
 
     # =====Test cases=====
     #give a path to the testcase file under the 'testcase' folder
-    testcase = 'SP53224_10020195.xlsx'
-    # testcase = 'case24_ieee_rts.xlsx'
-    #testcase = 'case2.xlsx'
+
+    # testcase = 'v2g_test_minimal_flatcost.xlsx'
+    testcase = 'v2g_test_minimal.xlsx'
+
     # =====Model=====
     #specify a model to solve
-    model ='EVSchedule'
+    model ='EVSchedule_V2G'
+
     # ==log==
     logging.info("Solver selected: "+opt['solver'])
     logging.info("Testcase selected: "+testcase)
