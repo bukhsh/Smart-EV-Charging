@@ -87,8 +87,13 @@ model.SLmaxT_E = Param(model.TRANSF, within=NonNegativeReals) # max emergency re
 model.GB = Param(model.SHUNT, within=Reals) #  shunt conductance
 model.BB = Param(model.SHUNT, within=Reals) #  shunt susceptance
 
-# cost data
-model.cost    = Param(model.G,model.T, within=Reals)# generator cost coefficient c2 (*pG^2)
+# cost data - V2G_V2 - put the cost in the EVs instead
+#model.cost    = Param(model.G,model.T, within=Reals)# generator cost coefficient c2 (*pG^2)
+
+#system buy price (SBP) and system sell price (SSP)
+model.SBP = Param(model.EV, model.T, within=Reals)
+model.SSP = Param(model.EV, model.T, within=Reals)
+
 
 model.baseMVA = Param(within=NonNegativeReals)# base MVA
 
@@ -103,6 +108,11 @@ model.alpha = Var(model.D, model.T, domain= NonNegativeReals) #propotion of real
 
 model.pEV    = Var(model.FlexTimes, domain= NonNegativeReals)  #real power charging
 model.SoC    = Var(model.FlexTimes, domain= NonNegativeReals)  #real power charging
+
+# --- bidirectional charging ---
+model.dEV    = Var(model.FlexTimes, domain= NonNegativeReals)  #real power discharging (sign = positive)
+
+
 # --- state variables ---
 model.deltaL   = Var(model.L, model.T, domain= Reals) # angle difference across lines
 model.deltaLT  = Var(model.TRANSF, model.T, domain= Reals) # angle difference across transformers
@@ -122,17 +132,25 @@ def objective(model):
     return obj
 model.OBJ = Objective(rule=objective, sense=minimize)
 
-# --- cost components of the objective function ---
-def precontingency_cost(model,t):
-    return model.CostTP[t] == sum(model.cost[g,t]*model.baseMVA*model.pG[g,t] for g in model.G)\
-    +sum(model.baseMVA*model.VOLL[d]*(1-model.alpha[d,t])*model.PD[d,t] for d in model.D)+10000*model.eps
-model.precontingency_cost_const = Constraint(model.T,rule=precontingency_cost)
+# --- cost components of the objective function --- (original)
+#def precontingency_cost(model,t):
+#    return model.CostTP[t] == sum(model.cost[g,t]*model.baseMVA*model.pG[g,t] for g in model.G)\
+#    +sum(model.baseMVA*model.VOLL[d]*(1-model.alpha[d,t])*model.PD[d,t] for d in model.D)+10000*model.eps
+#model.precontingency_cost_const = Constraint(model.T,rule=precontingency_cost)
 
-#sum(model.pEV[c,t] for c in model.EV if (((b,c) in model.EVbs) and (t in model.EVWindowsVars[c,:])) == \
+
+# --- cost components of the objective function --- (V2G edition with SBP and SSP)
+def precontingency_cost(model,t):
+    return model.CostTP[t] == sum(model.pEV[c,w,t]*model.baseMVA*model.SBP[c,t] for (c,w) in model.EVWindow if (c,w,t) in model.FlexTimes)\
+    -sum(model.dEV[c,w,t]*model.baseMVA*model.SSP[c,t] for (c,w) in model.EVWindow if (c,w,t) in model.FlexTimes)\
+    +sum(model.baseMVA*model.VOLL[d]*(1-model.alpha[d,t])*model.PD[d,t] for d in model.D)+10000*model.eps
+model.precontingency_cost_const = Constraint(model.T,rule=precontingency_cost)    
+
 
 # --- Kirchoff's current law Definition at each bus b ---
 def KCL_def(model, b,t):
-    return sum(model.pG[g,t] for g in model.G if (b,g) in model.Gbs) -\
+    return sum(model.pG[g,t] for g in model.G if (b,g) in model.Gbs) +\
+    sum(model.dEV[c,w,t] for (c,w) in model.EVWindow if (b,c) in model.EVbs if (c,w,t) in model.FlexTimes) -\
     sum(model.pEV[c,w,t] for (c,w) in model.EVWindow if (b,c) in model.EVbs if (c,w,t) in model.FlexTimes) == \
     sum(model.pD[d,t] for d in model.D if (b,d) in model.Dbs)+\
     sum(model.pL[l,t] for l in model.L if model.A[l,1]==b)- \
@@ -164,7 +182,7 @@ model.demandalphaC = Constraint(model.D, model.T, rule=demand_LS_bound_Max)
 
 # --- EV charging model ---
 def EV_SoC(model,c,w,t):
-    return model.SoC[c,w,t] == 1/6*model.pEV[c,w,t-1] + model.SoC[c,w,t-1]
+    return model.SoC[c,w,t] == 1/6*(0.9*model.pEV[c,w,t-1] - (1/0.9)*model.dEV[c,w,t-1]) + model.SoC[c,w,t-1]
 model.EVmodel = Constraint(model.FlexTimesRed,rule=EV_SoC)
 
 
@@ -181,9 +199,12 @@ def EV_ChargeCap1(model,c,w,t):
 def EV_ChargeCap2(model,c,w,t):
     # return model.SoC[c,w,t]<=model.EVUB[c]
     return model.pEV[c,w,t] <= (1.0/0.201)*model.PVUB[c]/model.EVUB[c]*(1.001*model.EVUB[c]-model.SoC[c,w,t])+model.eps
+def EV_ChargeCap3(model,c,w,t):
+    return model.dEV[c,w,t] <= model.PVUB[c]
 
 model.EV_ChargeCapConst1 = Constraint(model.FlexTimes,rule=EV_ChargeCap1)
 model.EV_ChargeCapConst2 = Constraint(model.FlexTimes,rule=EV_ChargeCap2)
+model.EV_ChargeCapConst3 = Constraint(model.FlexTimes,rule=EV_ChargeCap3)
 
 # --- generator power limits ---
 def Real_Power_Max(model,g,t):
@@ -196,9 +217,9 @@ model.PGminC = Constraint(model.G, model.T, rule=Real_Power_Min)
 
 # --- line power limits ---
 def line_lim1_def(model,l,t):
-    return model.pL[l,t] <= 0.7*model.SLmax[l]
+    return model.pL[l,t] <= model.SLmax[l]
 def line_lim2_def(model,l,t):
-    return model.pL[l,t] >= -0.7*model.SLmax[l]
+    return model.pL[l,t] >= -model.SLmax[l]
 #the next two lines creates line flow constraints for each line.
 model.line_lim1 = Constraint(model.L, model.T, rule=line_lim1_def)
 model.line_lim2 = Constraint(model.L, model.T, rule=line_lim2_def)

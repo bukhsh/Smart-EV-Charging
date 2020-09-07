@@ -64,7 +64,7 @@ class printoutput(object):
         cols_branch     = ['Time period','name', 'from_busname', 'to_busname', 'pL(kW)','SLmax(kW)']
         cols_transf     = ['Time period','name', 'from_busname', 'to_busname', 'pLT(kW)','SLmax(kW)']
         cols_generation = ['Time period','name', 'busname', 'PGLB(kW)', 'pG(kW)','PGUB(kW)']
-        cols_EVs        = ['Time period','name','Window','Charging(kW)','SoC(kWh)']
+        cols_EVs        = ['Time period','name','Window','Charging(kW)','Discharging(kW)','SoC(kWh)']
 
         summary         = pd.DataFrame(columns=cols_summary)
         bus             = pd.DataFrame(columns=cols_bus)
@@ -124,6 +124,7 @@ class printoutput(object):
         for (ev,w,t) in self.instance.FlexTimes:
             EV.loc[ind] = pd.Series({'Time period':t,'name':ev,\
                 'Window':w,'Charging(kW)':self.instance.pEV[ev,w,t].value,\
+                'Discharging(kW)':self.instance.dEV[ev,w,t].value,\
                 'SoC(kWh)':self.instance.SoC[ev,w,t].value})
             ind += 1
 
